@@ -53,7 +53,7 @@ def record_state(part, history=None):
 
 
 
-def draw(history, Walls, start_step=0, stop_step=None, ax=None):
+def draw(history, Walls, start_step=0, stop_step=None, ax=None, arrows=True):
     pos_hist = np.array(history['POS'][start_step:stop_step])
     vel_hist = np.array(history['VEL'][start_step:stop_step])
     
@@ -71,17 +71,19 @@ def draw(history, Walls, start_step=0, stop_step=None, ax=None):
     ax.plot(*pts)
         
 #     Draw arrow for velocity
-    ax.annotate("", xy=pos, xytext=pos+vel, arrowprops=dict(arrowstyle="<-"))
+    arr = vel / np.linalg.norm(vel) * part.radius * 2
+    ax.annotate("", xy=pos, xytext=pos+arr, arrowprops=dict(arrowstyle="<-"))
     
     # Draw trails
     if len(pos_hist) > 1:
         ax.plot(pos_hist[:,0], pos_hist[:,1], 'g:')
-        midpoints = (pos_hist[1:] + pos_hist[:-1]) / 2
-        vec = pos_hist[1:] - pos_hist[:-1]
-        mag = np.linalg.norm(vec, axis=1, keepdims=True)
-        vec /= mag
-        vec *= (mag.min() / 2)
-        ax.quiver(midpoints[:,0], midpoints[:,1], vec[:,0], vec[:,1])
+        if arrows:
+            midpoints = (pos_hist[1:] + pos_hist[:-1]) / 2
+            vec = pos_hist[1:] - pos_hist[:-1]
+            mag = np.linalg.norm(vec, axis=1, keepdims=True)
+            vec /= mag
+            vec *= (mag.min() / 2)
+            ax.quiver(midpoints[:,0], midpoints[:,1], vec[:,0], vec[:,1])
 
     ax.set_aspect('equal')
     return ax
