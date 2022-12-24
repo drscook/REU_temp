@@ -5,27 +5,81 @@ name: version bump and deploy
 on: workflow_dispatch
 jobs:
   bump-version:
+
     runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, '[SKIP]')"
+
     steps:
-    
+
     - uses: actions/checkout@v2
       with:
+        # I setup a new token for my GitHub user and added that token
+        # to the secrets in the repository
+        # When I tried
+        # https://docs.github.com/en/actions/reference/authentication-in-a-workflow
+        # I had some problems, they could be my fault, but yet, I felt using a
+        # dedicated token would be better and enough
         token: ${{ secrets.GH_TOKEN }}
-    
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
 
-    - name: automatically release main branch
-        run: |
-          git config --global user.name 'drscook'
-          git config --global user.email 'scook@tarleton.edu'
-          VERSION=`hatch version`
-          hatch version patch
-          NEW_VERSION=`hatch version`
-          git add REU_temp/__about__.py
-          git commit -m "Bump version: $VERSION → $NEW_VERSION"
-          git tag $VERSION
-          git push
-          git push --tags
+    - name: Setup Git
+      run: |
+        git config user.name "drscook"
+        git config user.email 'scook@tarleton.edu'
+        git remote set-url origin https://x-access-token:${{ secrets.GHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+        git checkout "${GITHUB_REF:11}"
+
+    - name: Setup env variables
+      run: |
+        echo "SKIPBUMP=FALSE" >> $GITHUB_ENV
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bump2version setuptools wheel twine
+
+    # If a commit starts with [MAJOR] a new major verion upgrade will be
+    # triggered. Use with caution as Major upgrades denote backwards
+    # incompatibility. Yet I like it to be integrated in the CI
+    - name: Bump Major Version
+      env:
+        COMMIT_MSG: ${{ github.event.head_commit.message }}
+      run: |
+        bump2version minor
+        echo "SKIPBUMP=TRUE" >> $GITHUB_ENV
+      if: "startsWith(github.event.head_commit.message, '[MAJOR]')"
+
+    - name: Bump Minor Version
+      env:
+        COMMIT_MSG: ${{ github.event.head_commit.message }}
+      run: |
+        bump2version minor
+        echo "SKIPBUMP=TRUE" >> $GITHUB_ENV
+      if: "startsWith(github.event.head_commit.message, '[FEATURE]')"
+
+    # Default action
+    - name: Bump Patch Version
+      env:
+        COMMIT_MSG: ${{ github.event.head_commit.message }}
+      run: |
+        bump2version patch
+      if: env.SKIPBUMP == 'FALSE'
+
+    - name: Commit version change to master
+      run: |
+        git push --follow-tags
+
+#     - name: Build and publish
+#       env:
+#         TWINE_USERNAME: ${{ secrets.PYPI_USER }}
+#         TWINE_PASSWORD: ${{ secrets.PYPI_PASS }}
+#       run: |
+#         python setup.py sdist bdist_wheel
+#         # note that here testpypi is used instead of the main pypi
+#         # because this is a test project
+#         # read more at: https://packaging.python.org/tutorials/packaging-projects/
+#         twine upload --repository testpypi dist/*
