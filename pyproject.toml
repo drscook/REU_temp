@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [tool.hatch.version]
-path = "test_drscook/__about__.py"
+path = "test_drscook2/__about__.py"
 
 #[tool.hatch.version]
 #source = "vcs"
