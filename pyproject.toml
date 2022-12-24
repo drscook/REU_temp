@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.metadata]
@@ -14,7 +14,9 @@ dependencies = [
 ]
 
 [tool.hatch.version]
-source = "vcs"
+path = "test_drscook/__about__.py"
 
-[tool.hatch.build.hooks.vcs]
-version-file = "test_drscook2/__version.py"
+#[tool.hatch.version]
+#source = "vcs"
+#[tool.hatch.build.hooks.vcs]
+#version-file = "test_drscook2/__version.py"
