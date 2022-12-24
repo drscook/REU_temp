@@ -1,32 +1,22 @@
-name: Bump
-on: None
+name: bump version
+# on: workflow_dispatch
+# on: push
+on: release
+
 jobs:
   build:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Get Version Number
-      uses: fwilhe2/bump-version@main
-      id: bump
-      with:
-        component: patch
-    - run: echo New Version Number ${{ steps.bump.outputs.newVersion }}
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-      with:
-        tag_name: ${{ steps.bump.outputs.newVersion }}
-        release_name: Release ${{ steps.bump.outputs.newVersion }}
-        draft: false
-        prerelease: false
-        body_path: release-notes-draft.md
-    - run: |
-        echo "" > release-notes-draft.md
-        git config --global user.name 'Scott Cook'
-        git config --global user.email 'scook@tarleton.edu'
-        git commit -am "Prepare next development iteration"
-        git push
+    - name: automatically release main branch
+        run: |
+          git config --global user.name 'drscook'
+          git config --global user.email 'scook@tarleton.edu'
+          VERSION=`hatch version`
+          hatch version release
+          NEW_VERSION=`hatch version`
+          git add REU_temp/__about__.py
+          git commit -m "Bump version: $VERSION → $NEW_VERSION"
+          git tag $VERSION
+          git push
+          git push --tags
