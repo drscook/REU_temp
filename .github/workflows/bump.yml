@@ -1,5 +1,5 @@
 name: Bump
-on: push
+on: None
 jobs:
   build:
     name: Create Release
