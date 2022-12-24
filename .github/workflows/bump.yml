@@ -1,11 +1,7 @@
-name: bump version
+name: version bump and deploy
 on: workflow_dispatch
-# on: push
-#on: release
-
 jobs:
-  build:
-    name: Create Release
+  bump-version:
     runs-on: ubuntu-latest
     steps:
     - name: automatically release main branch
