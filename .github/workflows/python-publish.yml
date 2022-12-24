@@ -9,14 +9,14 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.GH_TOKEN }}
-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.x'
+
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_TOKEN }}
 
     - name: Setup Git
       run: |
