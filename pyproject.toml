@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [project]
-name = "REU_temp"
+name = "test_drscook2"
 dynamic = ["version"]
 description = "A Demo for my stackoverflow question"
 dependencies = [
@@ -17,4 +17,4 @@ dependencies = [
 source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
-version-file = "REU_temp/__version.py"
+version-file = "test_drscook2/__version.py"
