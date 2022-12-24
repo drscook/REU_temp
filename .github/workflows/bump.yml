@@ -13,7 +13,7 @@ jobs:
           git config --global user.name 'drscook'
           git config --global user.email 'scook@tarleton.edu'
           VERSION=`hatch version`
-          hatch version release
+          hatch version patch
           NEW_VERSION=`hatch version`
           git add REU_temp/__about__.py
           git commit -m "Bump version: $VERSION → $NEW_VERSION"
