@@ -7,8 +7,11 @@ allow-direct-references = true
 
 [project]
 name = "REU_temp"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A Demo for my stackoverflow question"
 dependencies = [
     "shutils",
 ]
+
+[tool.hatch.version]
+path = "REU_temp/__about__.py"
